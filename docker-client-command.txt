@@ -1,0 +1,119 @@
+- เพื่อจะปิดตัว path ที่เราใช้งานอยู่จะได้ไม่บัง
+prompt $$
+
+-  ตอนที่ดู process สามารถจะเลือกดูเงื่อนไขในการดูได้
+docker ps --all --filter "status=exited"
+
+- ขั้น conatiner จะมี pull create start
+docker pull busybox
+docker create busybox #สามารตามด้วย comand ที่จะ start เช่น ls หรือ ping google.com
+docker start -a #ตามด้วยcontainerID
+
+- คำสั่งลบ container ทั้งหมดเลย
+docker system prune
+
+- sh เข้าไปยัง container หรือ bash ก็ได้ 
+docker exec -it #ตามด้วยcontainerID shหรือbash
+
+- รันด้วย full option 
+docker run -d -p 8080:80 --name my-nginx nginx 
+
+- ดู log ของ docker 
+docker logs -f #ตามด้วยcontainerID
+
+- ดูข้อมูลระบบ
+docker system info
+
+- ดูข้อมูลการจัดเก็บ
+docker system df
+
+-แสดงข้อมูลที่เกิดเหตุการ์ณกับ docker
+docker system events
+
+-แสดง images ทั้งหมดเลย
+docker images หรือ docker image ls 
+
+-ใช้ดูรายละเอียดของ image คำสั่งใช้งานครั้งแรกคืออะไร
+docker inspect #ตามด้วยชื่อ image
+
+-คำสั้งลบ image 
+docker image rm #ตามด้วยชื่อ image
+
+-ล้าง image ที่ไม่ได้ใช้ทั้งหมดออก
+docker image prune --all
+
+- สร้าง network เพื่อให้ container แต่ละอัน connect หากันได้
+docker network create #ตามด้วยชื่อ
+
+- ดู network ว่ามีอะไรบ้าง 
+docker network ls
+
+- คำสั่งรัน MYSQL 
+docker run --name mysql -e MYSQL_ROOT_PASSWORD=1111 -d mysql:5.7
+
+- คำสั้งรัน phpmyadmin
+docker run --name pma -p 8888:80 -e PMA_ARBITRARY=1 -d phpmyadmin/phpmyadmin
+
+- คำสั้งรัน wordpress
+docker run --name wordpress -p 888:80 --network wordpress -e WORDPRESS_DB_HOST=mysql -e WORDPRESS_DB_USER=root -e WORDPRESS_DB_PASSWORD=1111 -d wordpress
+
+- ใส่ network ให้รู้จักกันใน แต่ละ container 
+docker network connect #ตามด้วยชื่อnetwork  #ตามด้วยcontainerID
+เช่น
+docker network connect wordpress mysql
+docker network connect wordpress pma
+
+- เข้าไปดู network แต่ละอันว่ามีรายละเอียดอย่างไรบ้าง
+docker network inspect wordpress
+
+
+docker volume ls
+docker volume create #ตามด้วยชื่อ
+docker volume rm #ตามด้วยชื่อ #ตามด้วยชื่อ
+
+docker container inspect #ตามด้วยชื่อ container
+
+- Mount ในเครื่องหรือ volume ใช้ -v 
+docker run --name wordpress -p 888:80 --network wordpress -v #ชื่อของ volume หรือ path ในเครื่อง c: หรือ d: เลยก็ได้ :/var/www/html -e WORDPRESS_DB_HOST=mysql -e WORDPRESS_DB_USER=root -e WORDPRESS_DB_PASSWORD=1111 -d wordpress
+
+- คำสั่ง build docker file แบบ custom 
+docker build .
+
+- คำสั่ง build แบบกำหนดชื่อ และ tag เอง
+dockey build . -t#ตามด้วยชื่อที่จะตั้ง : #ตามด้วยเวอร์ชั้น tag เช่น
+docker build . -t mynodeapp:2.1 
+
+- คำสั่งรันแบบ bookmark volume คือ -v ตัวแรก และ mount volume ตัว -v หลัง 
+docker run -p 3006:3000 -v /usr/app/node_modules -v D:\Projects\Docker\Docker_Project\docker-bootcamp\application\nodejs:/usr/app mynodeapp:2.1
+
+
+docker network connect shoppers mymongodb
+docker run -d --name mynodejsapp -p 8000:8000 -e DATABASE_USER=admin -e DATABASE_PASSWORD=1111 -e DATABASE_HOST=mymongodb --network shoppers mynodejsapp:1.1
+docker run -d --name mymongodb mymongodb:1.0
+
+#รันด้วยระบุชื่อ dockerfile อื่น 
+docker build -f Dockerfile.prod .  -t myreactapp:1.1
+
+# คำสั่งไวเช็ก Docker-compose.yml ว่าถูกต้องหรือเปล่า จะต้องเข้าไปใน folder นั้นๆ
+docker-compose config 
+ถ้าเอาแบบไม่แสดงอะไรเลยใช่ -q 
+docker-compose config -q
+
+# คำสั่งรันตัว docker-compose ในไฟล์ config ที่เขียนไว
+docker-compose up -f #ตามด้วยชื่อไฟล์
+หรือ ถ้าตั้งแล้วเป้น docker-compose.yml ก็ไม่ต้องใส่ชื่อไฟล์
+docker-compose up หรือ -d 
+
+#คำสั้งในการหยุดทั้งหมด
+docker-compose down
+
+#คำสั้งในการสร้าง container ก่อนยังไม่ start
+docker-compose up --no-start
+#ดู ps ของ compose ที่สร้าง
+docker-compose ps
+docker-compose start
+
+- สั้งให้ docker compose rebuild ในไฟล์ เพื่อมีการอัพเดท code 
+docker-compose up -d --build
+
+docker run -d -p 9000:9000 -p 8000:8000 --name portainer --restart always -v /var/run/docker.sock:/var/run/docker.sock portainer/portainer
